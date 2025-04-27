@@ -12,14 +12,17 @@
 
 # testing()
 
-def debug(func):
-    def wrapper(*args, **kwargs):
-        print(f"Calling {func.__name__} with {args} and {kwargs}")
-        return func(*args, **kwargs)
-    return wrapper
+# from functools import wraps
+# from flask import redirect, url_for
 
-@debug
-def add(a, b):
-    return a + b
+# def login_required_custom(f):
+#     @wraps(f)
+#     def decorated_function(*args, **kwargs):
+#         if not current_user.is_authenticated:
+#             return redirect(url_for('login'))
+#         return f(*args, **kwargs)
+#     return decorated_function
 
-print(add(a=3, b=5))
+import os
+
+print(os.environ.get('FLASK_KEY'))
