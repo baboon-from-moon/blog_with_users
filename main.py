@@ -39,7 +39,10 @@ Bootstrap5(app)
 # CREATE DATABASE
 class Base(DeclarativeBase):
     pass
+
 app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get('DB_URI')
+# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///posts.db'
+
 db = SQLAlchemy(model_class=Base)
 db.init_app(app)
 login_manager = LoginManager()
@@ -61,7 +64,9 @@ class BlogPost(db.Model):
     author: Mapped["User"] = relationship(back_populates="posts")
 
 
-    comments: Mapped[List["Comment"]] = relationship(back_populates="parent_post")
+    comments: Mapped[List["Comment"]] = relationship(
+        "Comment", back_populates="parent_post", cascade="all, delete-orphan"
+    )
 
 
 # TODO: Create a User table for all your registered users. 
@@ -170,8 +175,13 @@ def show_post(post_id):
     users = db.session.execute(db.select(User))
     users_result = users.scalars().all()
     requested_post = db.get_or_404(BlogPost, post_id)
-    print('GAAS TULEB')
-    print(requested_post.comments[0].text)
+    if len(requested_post.comments) > 0:
+        if requested_post.comments:
+            print(requested_post.comments[0].text)
+        else:
+            print("No comments yet")
+        
+
     if form.validate_on_submit():
         if current_user.is_authenticated:
             new_comment = Comment(
